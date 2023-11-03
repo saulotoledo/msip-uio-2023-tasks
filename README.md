@@ -112,3 +112,116 @@ REPOSITORY  TAG    IMAGE ID    CREATED    SIZE
 ubuntu    latest  e4c58958181a  3 weeks ago  77.8MB
 hello-world  latest  9c7a54a9a43c  6 months ago  13.3kB
 ```
+
+### Task D5: Our first Dockerfile
+
+Create a folder named `msip-docker` on your computer.
+In this folder, create a file named `Dockerfile` (the first letter must be a capital `D`) with the following content:
+
+```
+FROM ubuntu:20.04
+
+CMD ["echo", "Hello", "World!"]
+```
+
+**Did you note that we used a specific version this time instead of `latest`?**
+
+Open a terminal in this folder and build the image:
+
+```sh
+docker build . -t msip-hello
+docker build . -t msip-hello:1.0
+```
+
+Next, check the images:
+
+```sh
+docker image ls
+
+REPOSITORY  TAG    IMAGE ID    CREATED    SIZE
+...
+msip-hello  1.0    670fcf3ec158  4 weeks ago  72.8MB
+msip-hello  latest  670fcf3ec158  4 weeks ago  72.8MB
+```
+
+We used a `tag` to specify the version. If a tag is not informed, `latest` is assumed.
+
+Finally, run a container based on your new image:
+
+```sh
+docker run msip-hello
+```
+
+
+### Task D6: Containerizing an application
+
+Clone the Docker "getting started" app and go to the `app` folder:
+
+```sh
+git clone https://github.com/docker/getting-started.git
+cd getting-started/app
+```
+
+Create a `Dockerfile` in this folder with the following content:
+
+```sh
+FROM node:16-alpine
+WORKDIR /app
+COPY . .
+RUN yarn install --production
+CMD ["node", "src/index.js"]
+```
+
+Build and run the app:
+
+```sh
+docker build -t node-app .
+docker run -p 3000:3000 node-app
+```
+
+Open your browser at [http://localhost:3000/](http://localhost:3000/).
+
+> **Question:** Did you notice the application keeps the container running?
+
+Stop the application with `Ctrl + C`. Then try the following command:
+
+```sh
+docker run -p 4000:3000 node-app
+```
+
+Open your browser at [http://localhost:4000/](http://localhost:4000/).
+
+> **Question:** What happened here?
+
+One more time, stop the application with `Ctrl + C` and try the following command:
+
+```sh
+docker run -d -p 4000:3000 node-app
+```
+
+Open your browser at [http://localhost:4000/](http://localhost:4000/). The container is now running as a background process. You can see, stop, and remove it with the following commands:
+
+```sh
+docker container ls
+docker stop <container-id>
+docker rm <container-id>
+```
+
+### Task D7: Creating a PostgreSQL container for development
+
+Let's do this one together. Follows the command we are going to run:
+
+```sh
+docker pull postgres
+docker pull dpage/pgadmin4
+docker image ls
+docker network create msip-network
+docker network ls
+docker run --name msip-postgres --network=msip-network -e "POSTGRES_PASSWORD=postgres" -d postgres:latest
+docker run --name msip-pgadmin --network=msip-network -p 8100:80 -e "PGADMIN_DEFAULT_EMAIL=admin@admin.com" -e "PGADMIN_DEFAULT_PASSWORD=postgres" -d dpage/pgadmin4:latest
+docker container ls
+```
+
+> **Hint:** Note that the new containers do not have random names anymore.
+
+Open [http://localhost:8100/](http://localhost:8100/) on your preferred browser.

@@ -370,7 +370,8 @@ kubectl delete pod msip-products
 
 Create a file named `replicaset.yml` with the following content:
 
-```yamlapiVersion: apps/v1
+```yaml
+apiVersion: apps/v1
 kind: ReplicaSet
 metadata:
   name: msip-products
